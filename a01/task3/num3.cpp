@@ -55,7 +55,7 @@ double onenorm(const std::vector<std::vector<double>>& input){
 }
 
 int main(){
-    std::string filename = "MatrixA.txt";
+    std::string filename = "./task3/MatrixA.txt";
     std::vector<std::vector<double>> input = readmat(filename);
     double onenormd = onenorm(input);
     double traced = trace(input);
