@@ -13,5 +13,4 @@ a4:
 	g++ -o ./a4 ./task4/num4.o
 
 clean:
-	rm -f task1.o COMPUTER.dat *.png
-	rm a1 a3 a4
+	rm -f task1 task1.o COMPUTER.dat *.png
