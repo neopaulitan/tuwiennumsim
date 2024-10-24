@@ -40,8 +40,8 @@ int main(){
     double final = onenorm(input);
     auto stop = high_resolution_clock::now();
     auto duration = duration_cast<microseconds>(stop - start);
-    std::cout << "1-norm for 1000 x 1000 matrix = " << final <<endl;
-    std::cout << "time elapsed: " << duration.count() << "ms" <<endl;
+//    std::cout << "1-norm for 1000 x 1000 matrix = " << final <<endl;
+    std::cout << duration.count() <<endl;
     
     return 0;
 }
