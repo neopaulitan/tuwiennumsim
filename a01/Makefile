@@ -1,8 +1,4 @@
-all: a1 a3 a4
-
-a1:
-	g++ -c ./task1/task1.C -o ./task1/task1.o
-	g++ -o ./a1 ./task1/task1.o
+all: a3 a4
 	
 a3:
 	g++ -c ./task3/num3.cpp -o ./task3/num3.o -std=c++11
