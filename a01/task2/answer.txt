@@ -1,0 +1,1 @@
+We can use the log-scale for the transistor count plot, as the transistor count rises exponentially. This does not apply to the Computer perfomance.
