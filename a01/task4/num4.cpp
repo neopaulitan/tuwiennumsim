@@ -1,4 +1,5 @@
 #include <iostream>
+#include <thread>
 #include <vector>
 #include <fstream>
 #include <sstream>
@@ -37,10 +38,10 @@ int main(){
     int n = 1000;
     std::vector<std::vector<double>> input = matgen(n);
     auto start = high_resolution_clock::now();
-    double final = onenorm(input);
+    double final_ =  onenorm(input);
     auto stop = high_resolution_clock::now();
     auto duration = duration_cast<microseconds>(stop - start);
-//    std::cout << "1-norm for 1000 x 1000 matrix = " << final <<endl;
+		asm volatile ("" : : "g" (final_)); // prevent dead code elimination
     std::cout << duration.count() <<endl;
     
     return 0;
