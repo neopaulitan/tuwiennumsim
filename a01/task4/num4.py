@@ -8,7 +8,10 @@ runs = np.zeros((numrun,4))
 
 for i in range(4):
 	for j in range(numrun):
-		runs[j][i] = subprocess.run([f"./task4_{i}"], capture_output = True).stdout
+		outputline = subprocess.run([f"./task4_{i}"], capture_output = True).stdout
+		lines = outputline.splitlines()
+		runs[j][i] = float(lines[1].strip())
+		
 
 avgs = [np.mean(runs[:,i]) for i in range(4)]
 vari = [np.var(runs[:,i]) for i in range(4)]
