@@ -1,10 +1,19 @@
-all:
-	# compile
-	g++ -c ./task1.C -o ./task1.o
-	g++ -o ./task1.exe ./task1.o
-	
-	# run executable
-	./task1.exe
+# Compiler and flags
+CXX = g++
+CXXFLAGS = -Wall -std=c++11
 
-	# clean unnecessary binaries/executables
-	rm ./task1.exe ./task1.o
+# Target executable
+TARGET = task1
+
+# Source file
+SRC = task1.cpp
+
+# Default rule to compile and link
+all: $(TARGET)
+
+$(TARGET): $(SRC)
+	$(CXX) $(CXXFLAGS) -o $(TARGET) $(SRC)
+
+# Clean the compiled files
+clean:
+	rm -f $(TARGET)
