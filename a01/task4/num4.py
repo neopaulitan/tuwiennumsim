@@ -17,6 +17,7 @@ titles = ["-O0", "-O1", "-O2", "-O3"]
 fig1, (ax1,ax2) = plt.subplots(2, figsize = (6,12))
 ax1.scatter(titles, avgs)
 ax1.set_xlabel("Optimization Flags")
+ax1.set_yscale("log")
 ax1.set_ylabel("Mean Run Time (microsecond)")
 
 ax2.scatter(titles, vari)
