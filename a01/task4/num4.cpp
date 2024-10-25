@@ -20,18 +20,18 @@ std::vector<std::vector<double>> matgen(int n){
 }
 
 double onenorm(const std::vector<std::vector<double>>& input){
-	int n = input.size();
-	double sum = 0;
-	for (int i = 0; i<n;i++){
-		double max = input[0][i];
-		for (int j = 0; j < n; j++){
-			if (max < input[j][i]){
-				max = input[j][i];
-			}
+   int n = input.size();
+	 double max_row_sum = 0;
+	 for (int j = 0; j < n; j++){ 
+		double row_sum = 0;
+		for(int i = 0; i < n; i++){
+			row_sum += std::abs(input[i][j]);
+	 	}
+		if(row_sum > max_row_sum){
+		 max_row_sum = row_sum;
 		}
-		sum += max;
-	}
-	return sum;
+	 }
+	 return max_row_sum;
 }
 
 int main(){
