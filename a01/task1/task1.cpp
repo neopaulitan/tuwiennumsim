@@ -1,31 +1,31 @@
-#include "task1.H"
+#include "task1.hpp"
 
 int main(){
     std::vector<properties> data_list;
 
     // (C)
-    std::cout<<"transistors data:"<<std::endl;
+    // std::cout<<"transistors data:"<<std::endl;
     int transistors_data_num=0;
     transistors_read(data_list);
     transistors_data_num=data_list.size();
-    for(int i=0; i<data_list.size(); i++){
-        std::cout<<i<<":"<<data_list[i].year<<" "<<data_list[i].CPU_transistor_count<<std::endl;
-    }
+    // for(int i=0; i<data_list.size(); i++){
+    //     std::cout<<i<<":"<<data_list[i].year<<" "<<data_list[i].CPU_transistor_count<<std::endl;
+    // }
 
-    std::cout<<"specint data:"<<std::endl;
+    // std::cout<<"specint data:"<<std::endl;
     int specint_data_num=0;
     specint_read(data_list);
     specint_data_num=data_list.size()-transistors_data_num;
-    for(int i=transistors_data_num; i<data_list.size(); i++){
-        std::cout<<i-transistors_data_num<<":"<<data_list[i].year<<" "<<data_list[i].specint_perfm_number<<std::endl;
-    }
+    // for(int i=transistors_data_num; i<data_list.size(); i++){
+    //     std::cout<<i-transistors_data_num<<":"<<data_list[i].year<<" "<<data_list[i].specint_perfm_number<<std::endl;
+    // }
 
     // (D)
-    std::cout<<"merge entries by year:"<<std::endl;
+    // std::cout<<"merge entries by year:"<<std::endl;
     merge_by_year(data_list);
-    for(int i=0; i<data_list.size(); i++){
-        std::cout<<i<<":"<<data_list[i].year<<" "<<data_list[i].CPU_transistor_count<<std::endl;
-    }
+    // for(int i=0; i<data_list.size(); i++){
+    //     std::cout<<i<<":"<<data_list[i].year<<" "<<data_list[i].CPU_transistor_count<<std::endl;
+    // }
 
     // (E)
     save_data(data_list);
@@ -90,7 +90,7 @@ void specint_read(std::vector<properties> &data_list){
                     // C2
                     specint_perfm_number=stod(split(line, ' ')[i])*1e-3;
                     // C3
-                    specint_perfm_number=std::round(specint_perfm_number);
+                    specint_perfm_number=specint_perfm_number;
                     break;
                 }
             }
