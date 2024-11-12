@@ -7,3 +7,8 @@ all_O0-3:
 	done
 
 	python3 ./num4.py
+
+clean:
+	rm ./task4_*
+	rm *.png
+	rm *.o
