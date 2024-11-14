@@ -14,7 +14,7 @@ for i in range(4):
 		
 
 avgs = [np.mean(runs[:,i]) for i in range(4)]
-vari = [np.var(runs[:,i]) for i in range(4)]
+vari = [(np.var(runs[:,i]) ** (1/2)) for i in range(4)]
 titles = ["-O0", "-O1", "-O2", "-O3"]
 
 fig1, (ax1,ax2) = plt.subplots(2, figsize = (6,12))
