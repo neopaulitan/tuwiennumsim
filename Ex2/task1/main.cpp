@@ -65,6 +65,7 @@ int main() {
       8'000,   20'000,  30'000,    40'000,    50'000,    60'000,    100'000,
       200'000, 300'000, 1'000'000, 2'000'000, 5'000'000, 10'000'000};
 
+  /*
   // 1: vector length (N) VS FLOPs
   for (auto &test : Tests) {
     Vector a(test.N, 1.0);  // 200/300/.../10000000 ones
@@ -76,10 +77,10 @@ int main() {
       test.runtime+=timeit::run(triad, a, b, c, d);
     }
     test.runtime/=40;
-    // FLOPs/s
-    double FLOPs=2*test.N/test.runtime;
-    std::cout<<"FLOPs: "<<FLOPs<<std::endl;
-    // test.print1(); // details
+    //FLOPs/s
+    //double FLOPs=2*test.N/test.runtime;
+    //std::cout<<"FLOPs: "<<FLOPs<<std::endl;
+    test.print(); // details
   }
   
   // 2: indicate cache size of my system
@@ -109,24 +110,27 @@ int main() {
   }
   std::cout<<"L1d:"<<L1d<<"KB L1i:"<<L1i<<"KB L2:"<<L2<<"MB L3:"<<L3<<"MB"<<std::endl;
   system_info.close();
+  */
 
   for (auto &test : Tests) {
     Vector a(test.N, 1.0);  // 200/300/.../10000000 ones
     Vector b(test.N, 1.0);  // 200/300/.../10000000 ones
     Vector c(test.N, 1.0);  // 200/300/.../10000000 ones
     Vector d(test.N, 1.0);  // 200/300/.../10000000 ones
+    /*
     for (int n = 0; n != 19; ++n)
       timeit::run(triad, a, b, c, d); // repeat x19 times of triad(i.e. loop a[i]=b[i]+c[i]*d[i])
+    */
     int N = 40;
     for (int n = 0; n != N; ++n) // averaged triad runtime
       test.runtime += timeit::run(triad, a, b, c, d);
     test.runtime /= N;
   }
-
+  
   for (auto &test : Tests) {
     // test.print(); // print with details
     test.print2(); // print values only
   }
-
+  
   return 0;
 }
