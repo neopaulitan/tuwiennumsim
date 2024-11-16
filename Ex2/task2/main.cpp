@@ -125,12 +125,13 @@ std::chrono::duration<double> MMM_Eigen(int N) {
 int main(int argc, char *argv[]) try {
   auto [mode, size] = program_options::parse(argc, argv);
   std::size_t N = size;
+  std::chrono::duration<double> elapsed_time;
   if (mode == "CUSTOM") {
-    std::chrono::duration<double> elapsed_time = MMM_custom(N);
+   elapsed_time = MMM_custom(N);
   } else if (mode == "EIGEN") {
-    std::chrono::duration<double> elapsed_time = MMM_Eigen(N);
+   elapsed_time = MMM_Eigen(N);
   } else if (mode == "BLAS") {
-    std::chrono::duration<double> elapsed_time = MMM_OpenBLAS(N);
+   elapsed_time = MMM_OpenBLAS(N);
   }
   std::cout << elapsed_time.count() << std::endl;
   return EXIT_SUCCESS;
