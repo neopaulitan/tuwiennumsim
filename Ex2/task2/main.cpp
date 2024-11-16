@@ -27,7 +27,7 @@ std::tuple<std::string, std::size_t> parse(int argc, char *argv[]) {
   std::size_t size;
   if (std::sscanf(argv[2], "%zu", &size) != 1 && size != 0)
     throw std::runtime_error("invalid size");
-  std::printf("arguments: impl=%s size=%zu\n", mode.data(), size);
+  // std::printf("arguments: impl=%s size=%zu\n", mode.data(), size);
   return {mode, size};
 }
 } // namespace program_options
