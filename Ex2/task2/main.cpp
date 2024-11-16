@@ -12,9 +12,11 @@
 
 #include <cblas.h>
 #include <eigen3/Eigen/Dense>
+#include <chrono>
+#include <cassert>
+#include <eigen3/Eigen/Dense>
 
 namespace program_options {
-
 std::tuple<std::string, std::size_t> parse(int argc, char *argv[]) {
   if (argc != 3)
     throw std::runtime_error("unexpected number of arguments");
@@ -31,13 +33,115 @@ std::tuple<std::string, std::size_t> parse(int argc, char *argv[]) {
 
 } // namespace program_options
 
+std::chrono::duration<double> MMM_custom(int N){
+  // prepare Matricies
+  int M[N][N];
+  int MT[N][N];
+  int MMT[N][N] = {}; // this is the product of M & MT
+  for (int i = 0; i < N; i++){
+    for (int j = 0; j < N; j++){
+      M[i][j] = i + j * N;
+      MT[i][j] = j + i * N;
+    } 
+  }
+  // perform actual MMM
+  auto start_time = std::chrono::high_resolution_clock::now();
+  for (int i = 0; i < N; i++){
+    for (int j = 0; j < N; j++){
+      for (int k = 0; k < N; k++){
+        MMT[i][j] += M[k][i] * MT[j][k]; 
+      }
+    }
+  }
+  auto end_time = std::chrono::high_resolution_clock::now();
+  std::chrono::duration<double> elapsed_time = end_time - start_time;
+  
+  // perform symmetry check
+  for (int i = 0; i < N; i++){
+   for (int j = 0; j < N; j++){
+    assert(MMT[i][j] == MMT[j][i]);
+    std::cout << "MMT[" << i << "][ " << j <<"] = " << MMT[i][j] << std::endl;
+     }
+   } 
+  return elapsed_time;
+}
+
+std::chrono::duration<double> MMM_OpenBLAS(int N){
+  // prepare the matricies
+  const double alpha = 1.0;
+  const double beta = 0.0;
+  std::vector<double> M;
+  for (int i = 0; i < N * N; i++){
+    M.push_back(i);
+  }
+  std::vector<double> MMT(N*N, 0.0);
+
+// perform the Matrix-Matrix Multiplication
+  auto start_time = std::chrono::high_resolution_clock::now();
+  cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasTrans, N, N, N, alpha, M.data(), N, M.data(), N, beta, MMT.data(), N);  
+  auto end_time = std::chrono::high_resolution_clock::now();
+  std::chrono::duration<double> elapsed_time = end_time - start_time;
+  
+  // perform symmetry check
+  for (int i = 0; i < N; i++){
+    for (int j = 0; j < N; j++){
+      assert(MMT[i + j * N] == MMT[j + i * N]);
+    }
+  }
+  for (int i = 0; i < N; i++) {
+    for (int j = 0; j < N; j++) {
+      std::cout << MMT[i * N + j] << " ";
+      } 
+     std::cout << "\n";
+     }
+  return elapsed_time;
+}
+
+std::chrono::duration<double> MMM_Eigen(int N){
+  // prepare the matricies
+  Eigen::MatrixXd M(N, N);
+  for (int i = 0; i < N; i++){
+    for(int j = 0; j < N; j++){
+      M(i, j) = j + i*N;
+    }
+  }
+  Eigen::MatrixXd MT = M.transpose();
+  // perform the Matrix-Matrix Multiplication
+  auto start_time = std::chrono::high_resolution_clock::now();
+  Eigen::MatrixXd MMT = M * MT;
+  auto end_time = std::chrono::high_resolution_clock::now();
+  std::chrono::duration<double> elapsed_time = end_time - start_time;
+  // perform symmetry check
+  for (int i = 0; i < N; i++){
+   for (int j = 0; j < N; j++){
+    assert(MMT(i, j) == MMT(j, i));
+    std::cout << "MMT(" << i << ", " << j <<") = " << MMT(i,j) << std::endl;
+     }
+   } 
+  
+  return elapsed_time;
+}
+
+
 int main(int argc, char *argv[]) try {
-
   auto [mode, size] = program_options::parse(argc, argv);
-
   std::size_t N = size;
   std::string impl = mode;
-
+  if (mode == "CUSTOM"){
+      std::cout << "custom mode selected" << std::endl;
+      std::chrono::duration<double> elapsed_time = MMM_custom(N);
+      std::cout <<  elapsed_time.count() << std::endl;
+  } else if (mode == "EIGEN"){
+      std::cout << "Eigen selected" << std::endl;
+      std::chrono::duration<double> elapsed_time = MMM_Eigen(N);
+      std::cout <<  elapsed_time.count() << std::endl;
+   } else if (mode == "BLAS"){
+      std::cout << "blas selected" << std::endl;
+      std::chrono::duration<double> elapsed_time = MMM_OpenBLAS(N);
+      std::cout <<  elapsed_time.count() << std::endl;
+   } else{
+     std::cout << "mode not supported. Use 'CUSTOM', 'EIGEN', or 'BLAS'" << std::endl;
+   }
   return EXIT_SUCCESS;
 } catch (std::exception &e) {
   std::cout << e.what() << std::endl;
