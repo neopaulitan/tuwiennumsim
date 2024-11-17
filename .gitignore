@@ -1,4 +1,5 @@
 ./Objects
 *.o
 *.a
-./.idea
+.idea
+.vscode
