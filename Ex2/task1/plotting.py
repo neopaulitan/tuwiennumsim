@@ -45,7 +45,7 @@ for cache in get_cache_sizes_in_bytes().items():
     plt.axvline(x=cache[1]/32, color=cmap[i], label=cache[0])
     i += 1
 
-plt.xlabel('N(vec size)')
+plt.xlabel('N(vec. size)')
 plt.ylabel('FLOPs')
 plt.legend()
 plt.show()
