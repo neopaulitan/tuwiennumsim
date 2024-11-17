@@ -5,11 +5,11 @@ import subprocess
 def parse_size(size_str):
     size_str = size_str.upper().strip()
     if size_str.endswith("KIB"):
-        return int(size_str[:-3]) * 1024
+        return float(size_str[:-3]) * 1024
     elif size_str.endswith("MIB"):
-        return int(size_str[:-3]) * 1024 ** 2
+        return float(size_str[:-3]) * 1024 ** 2
     elif size_str.endswith("GIB"):
-        return int(size_str[:-3]) * 1024 ** 3
+        return float(size_str[:-3]) * 1024 ** 3
     else:
         return int(size_str)
 
@@ -45,7 +45,7 @@ for cache in get_cache_sizes_in_bytes().items():
     plt.axvline(x=cache[1]/32, color=cmap[i], label=cache[0])
     i += 1
 
-plt.xlabel('N')
+plt.xlabel('N(vec size)')
 plt.ylabel('FLOPs')
 plt.legend()
 plt.show()
