@@ -34,9 +34,12 @@ std::tuple<std::string, std::size_t> parse(int argc, char *argv[]) {
 
 std::chrono::duration<double> MMM_custom(int N) {
   // prepare Matricies
-  int M[N][N];
-  int MT[N][N];
-  int MMT[N][N]; // this is the product of M & MT
+  //int M[N][N];
+  //int MT[N][N];
+  //int MMT[N][N]; // this is the product of M & MT
+  std::vector<std::vector<int>> M(N, std::vector<int>(N, 0));
+  std::vector<std::vector<int>> MT(N, std::vector<int>(N, 0));
+  std::vector<std::vector<int>> MMT(N, std::vector<int>(N, 0));
   for (int i = 0; i < N; i++) {
     for (int j = 0; j < N; j++) {
       M[i][j] = i + j * N;
