@@ -36,19 +36,20 @@ std::chrono::duration<double> MMM_custom(int N) {
   // prepare Matricies
   int M[N][N];
   int MT[N][N];
-  int MMT[N][N] = {}; // this is the product of M & MT
+  int MMT[N][N]; // this is the product of M & MT
   for (int i = 0; i < N; i++) {
     for (int j = 0; j < N; j++) {
       M[i][j] = i + j * N;
       MT[i][j] = j + i * N;
+      MMT[i][j] = 0;
     }
   }
   // perform actual MMM
   auto start_time = std::chrono::high_resolution_clock::now();
-  for (int i = 0; i < N; i++) {
-    for (int j = 0; j < N; j++) {
+  for (int j = 0; j < N; j++) {
+    for (int i = 0; i < N; i++) {
       for (int k = 0; k < N; k++) {
-        MMT[i][j] += M[k][i] * MT[j][k];
+        MMT[i][j] = M[k][j] * MT[i][k];
       }
     }
   }
@@ -58,10 +59,10 @@ std::chrono::duration<double> MMM_custom(int N) {
   for (int i = 0; i < N; i++) {
     for (int j = 0; j < N; j++) {
       assert(MMT[i][j] == MMT[j][i]);
-      // std::cout << "MMT[" << i << "][ " << j <<"] = " << MMT[i][j] <<
-      // std::endl;
+      // std::cout << "MMT[" << i << "][ " << j <<"] = " << MMT[i][j] <<std::endl;
     }
   }
+  // std::cout << "symmetric: ";
   return elapsed_time;
 }
 
