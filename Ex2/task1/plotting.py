@@ -41,6 +41,9 @@ cmap = ['red', 'blue', 'yellow']
 
 plt.semilogx(flop_data[:,0], (2*flop_data[:,0]/flop_data[:,1]))
 
+for line in flop_data:
+    print(2*line[0] / flop_data[1])
+
 for cache in get_cache_sizes_in_bytes().items():
     plt.axvline(x=cache[1]/32, color=cmap[i], label=cache[0])
     i += 1
@@ -48,4 +51,5 @@ for cache in get_cache_sizes_in_bytes().items():
 plt.xlabel('N')
 plt.ylabel('FLOPs')
 plt.legend()
+plt.grid()
 plt.show()

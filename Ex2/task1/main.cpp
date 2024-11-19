@@ -60,70 +60,21 @@ std::vector<std::string> split (const std::string &s, char delim) {
 }
 
 int main() {
-  std::vector<Test> Tests = {
-      100,       200,       300,       400,       500,       600,       700,       800,       900,
-      1'000,     2'000,     3'000,     4'000,     5'000,     6'000,     7'000,     8'000,     9'000, 
-      10'000,    20'000,    30'000,    40'000,    50'000,    60'000,    70'000,    80'000,    90'000,
-      100'000,   200'000,   300'000,   400'000,   500'000,   600'000,   700'000,   800'000,   900'000, 
-      1'000'000, 2'000'000, 3'000'000, 4'000'000, 5'000'000, 6'000'000, 7'000'000, 8'000'000, 9'000'000, 
-      10'000'000};
-
-  /*
-  // 1: vector length (N) VS FLOPs
+  std::vector<Test> Tests ={2, 4, 8, 16, 32, 64, 128, 200, 256, 300, 400, 512, 600, 700,
+    800, 900,1000, 1023, 1024, 1025,1030, 1050, 1100, 1400, 1600, 1800, 2000, 2047, 2048, 2049, 2100
+      , 2300, 2500, 3000, 3072, 3100, 3300, 3600, 3900, 4096, 4500, 4800, 5000, 5500,
+    6000,6143 ,6144,6145, 6200, 
+    6500,  7000, 8000, 8192, 8600,
+    9000, 10'000, 10'240, 10500,11000, 12000, 13000, 14000, 15000, 20000, 25000, 
+ 30000, 35000, 36000, 40000, 50000, 60000, 70000, 80000, 90000, 100000,
+  200000, 250000, 300000, 400000, 5000000};
   for (auto &test : Tests) {
     Vector a(test.N, 1.0);  // 200/300/.../10000000 ones
     Vector b(test.N, 1.0);  // 200/300/.../10000000 ones
     Vector c(test.N, 1.0);  // 200/300/.../10000000 ones
     Vector d(test.N, 1.0);  // 200/300/.../10000000 ones
-    // average triad runtime
-    for (int i=0; i!=40; ++i){
-      test.runtime+=timeit::run(triad, a, b, c, d);
-    }
-    test.runtime/=40;
-    //FLOPs/s
-    //double FLOPs=2*test.N/test.runtime;
-    //std::cout<<"FLOPs: "<<FLOPs<<std::endl;
-    test.print(); // details
-  }
-  
-  // 2: indicate cache size of my system
-  system("rm ./system_info.txt");
-  system("lscpu >> ./system_info.txt");
-  double L1d, L1i, L2, L3;
-  std::ifstream system_info;
-  system_info.open("./system_info.txt");
-  std::string value;
-  while(std::getline(system_info, value)){
-      // L1d
-      if(value.find("L1d")!=std::string::npos){
-        L1d=stod(split(value, ' ')[2]);
-      }
-      // L1i
-      if(value.find("L1i")!=std::string::npos){
-        L1i=stod(split(value, ' ')[2]);
-      }
-      // L2
-      if(value.find("L2")!=std::string::npos){
-        L2=stod(split(value, ' ')[2]);
-      }
-      // L3
-      if(value.find("L3")!=std::string::npos){
-        L3=stod(split(value, ' ')[2]);
-      }
-  }
-  std::cout<<"L1d:"<<L1d<<"KB L1i:"<<L1i<<"KB L2:"<<L2<<"MB L3:"<<L3<<"MB"<<std::endl;
-  system_info.close();
-  */
-
-  for (auto &test : Tests) {
-    Vector a(test.N, 1.0);  // 200/300/.../10000000 ones
-    Vector b(test.N, 1.0);  // 200/300/.../10000000 ones
-    Vector c(test.N, 1.0);  // 200/300/.../10000000 ones
-    Vector d(test.N, 1.0);  // 200/300/.../10000000 ones
-    /*
     for (int n = 0; n != 19; ++n)
-      timeit::run(triad, a, b, c, d); // repeat x19 times of triad(i.e. loop a[i]=b[i]+c[i]*d[i])
-    */
+      timeit::run(triad, a, b, c, d); // warmup
     int N = 40;
     for (int n = 0; n != N; ++n) // averaged triad runtime
       test.runtime += timeit::run(triad, a, b, c, d);
