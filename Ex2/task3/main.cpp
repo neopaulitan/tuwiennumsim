@@ -10,6 +10,7 @@
 #include <string>
 #include <tuple>
 #include <vector>
+using namespace std;
 
 namespace program_options {
 
