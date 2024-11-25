@@ -185,11 +185,45 @@ void jacobi(mesh Mesh, double **A, double *u, double *b, int maxiter){
 				}
 			}
 			u[i]=(b[i]-sum)/A[i][i];
-      std::cout<<i<<"/"<<Mesh.matsize<<std::endl;
+      // std::cout<<i<<"/"<<Mesh.matsize<<std::endl;
 		}
 		iter++;
 	}
   return;
+}
+
+double* matvecmult(mesh Mesh, double **A, double *u){
+	// initialize output vector
+  double *b=new double[Mesh.matsize];
+  for(int i=0; i<Mesh.matsize; i++){
+    b[i]=0;
+  }
+  // update A*u
+  for(int i=0; i<Mesh.matsize; i++){
+		for(int j=0; j<Mesh.matsize; j++){
+			b[i]+=A[i][j]*u[j];
+		}
+	}
+	return b;
+}
+
+//norm_2 (Euclidean) calc
+double norm2calc(double* vec, int size){
+	double norm2=0.0;
+	for (int i=0; i<size; i++){
+		norm2+=std::pow(vec[i], 2);
+	}
+	norm2=std::sqrt(norm2);
+	return norm2;
+}
+
+//norm_inf (Maximum) calc
+double norminfcalc(double* vec, int size){
+	double norminf=0.0;
+	for(int i=0; i<size; i++){
+		norminf=max(norminf, std::abs(vec[i]));
+	}
+	return norminf;
 }
 
 int main(int argc, char *argv[]) try{
@@ -255,14 +289,28 @@ int main(int argc, char *argv[]) try{
 	diagdomchecker(Mesh, A);
 
   // 3.2
+  // 3.2.1: initial solution
   double *u=new double[Mesh.matsize];
   for(int i=0; i<Mesh.matsize; i++){ u[i]=0; }
   auto start=high_resolution_clock::now();
   jacobi(Mesh, A, u, b, opts.iters);
   auto stop=high_resolution_clock::now();
+  // 3.2.2: residual, norm_2, norm_inf --> console
+  double* b_approx=matvecmult(Mesh, A, u);
+  double* resid=new double[Mesh.matsize];
+  for(int i=0; i<Mesh.matsize; i++){
+    resid[i]=b_approx[i]-b[i];
+  }
+  double norm2=norm2calc(resid, Mesh.matsize);
+  cout << "norm-2 of residual = " << norm2 << endl;
+  double norminf=norminfcalc(resid, Mesh.matsize);
+  cout << "norm-inf of residual = " << norminf << endl;
+  // 3.2.3: total time --> console
   std::chrono::duration<double> elapsed_time = stop - start;
-  std::cout<<"runtime: "<<elapsed_time.count()<<"s"<<std::endl;
-  write(u); // write out the mesh
+  auto duration = (stop - start);
+  std::cout << "jacobi process' time taken: " << duration.count() << "E-6 s" <<endl; // e-6 really?
+  // 3.2.4: write out the results
+  write(u);
 
   return EXIT_SUCCESS;
 } catch (std::exception &e) {
