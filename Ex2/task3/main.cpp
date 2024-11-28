@@ -84,14 +84,14 @@ void Amatgen(mesh Mesh, double **A){
 	double cx=-1.0/std::pow(Mesh.h, 2);
 	double cy=-1.0/std::pow(Mesh.h, 2);
 	double c1=2*cx+2*cy;
-	for(int j=0; j<Mesh.N-2; j++){
+	for(int j=0; j<Mesh.N; j++){
 		for(int i=0; i<Mesh.N-2; i++){
 			int idx=i+j*(Mesh.N-2);
 			A[idx][idx]=c1;
 			if(j>0){
 				A[idx][idx-(Mesh.N-2)]=cy;
 			}
-			if(j<Mesh.N-3){
+			if(j<Mesh.N-1){
 				A[idx][idx+(Mesh.N-2)]=cy;
 			}
 			if(i>0){
@@ -99,6 +99,17 @@ void Amatgen(mesh Mesh, double **A){
 			}
 			if(i<Mesh.N-3){
 				A[idx][idx+1]=cx;
+			}
+      // applying boundary conditions
+      // top Neumann cells
+      if(j==0){
+        // j=0: u_S(ghost)=u_N, u_S+u_N=2*u_N
+        A[idx][idx+(Mesh.N-2)]+=cy;
+      }
+      // bottom Neumann cells
+      if(j==Mesh.N-1){
+        // j=N-1: u_N(ghost)=u_S, u_S+u_N=2*u_S
+				A[idx][idx-(Mesh.N-2)]+=cy;
 			}
 		}
 	}
@@ -108,8 +119,8 @@ void Amatgen(mesh Mesh, double **A){
 // RHS vector b
 void  sourcevec(mesh Mesh, double *b, double dev, double xsrc, double ysrc, double BC_dirichlet_W, double BC_dirichlet_E, double BC_neumann=0.0){
 	// basic source term (i,j only for blue points)
-	for (int j=0; j<Mesh.N-2; j++){
-		double ypos=Mesh.h+j*Mesh.h;
+	for (int j=0; j<Mesh.N; j++){
+		double ypos=j*Mesh.h;
     for (int i=0; i<Mesh.N-2; i++){
       int idx=i+j*(Mesh.N-2);
       double xpos=Mesh.h+i*Mesh.h;
@@ -120,20 +131,20 @@ void  sourcevec(mesh Mesh, double *b, double dev, double xsrc, double ysrc, doub
   // bottom Neumann cells: j=0
   for(int i=0; i<Mesh.N-2; i++){
     int idx=i+0*(Mesh.N-2);
-    b[idx]+=1.0/std::pow(Mesh.h, 2)*BC_neumann; // b+1/h^2 * u_S = b+0
+    b[idx]+=-2*1.0/Mesh.h*BC_neumann; // b-2/h*g * u_S = b+0
   }
-  // top Neumann cells: j=N-3
+  // top Neumann cells: j=N-1
   for(int i=0; i<Mesh.N-2; i++){
-    int idx=i+(Mesh.N-3)*(Mesh.N-2);
-    b[idx]+=1.0/std::pow(Mesh.h, 2)*BC_neumann; // b+1/h^2 * u_N = b+0
+    int idx=i+(Mesh.N-1)*(Mesh.N-2);
+    b[idx]+=-2*1.0/Mesh.h*BC_neumann; // b-2/h*g * u_N = b+0
   }
   // left Dirichlet cells: i=0
-  for(int j=0; j<Mesh.N-2; j++){
+  for(int j=0; j<Mesh.N; j++){
     int idx=0+j*(Mesh.N-2);
     b[idx]+=1.0/std::pow(Mesh.h, 2)*BC_dirichlet_W; // b+1/h^2 * u_W
   }
   // right Dirichlet cells: i=N-3
-  for(int j=0; j<Mesh.N-2; j++){
+  for(int j=0; j<Mesh.N; j++){
     int idx=(Mesh.N-3)+j*(Mesh.N-2);
     b[idx]+=1.0/std::pow(Mesh.h, 2)*BC_dirichlet_E; // b+1/h^2 * u_E
   }
@@ -248,7 +259,7 @@ int main(int argc, char *argv[]) try{
   Mesh.N=opts.N;
   Mesh.h=1.0/(opts.N-1);
   Mesh.NN=opts.N*opts.N;
-  Mesh.matsize=(opts.N-2)*(opts.N-2);
+  Mesh.matsize=opts.N*(opts.N-2);
 
   // 3.1.1: initialize A, b
   double** A=new double*[Mesh.matsize];
@@ -272,8 +283,8 @@ int main(int argc, char *argv[]) try{
   // 3.1.2: illustrate A
   std::cout<<"writing A into csv"<<std::endl;
   std::ofstream Aout("./A.csv");
-  for(int j=0; j<Mesh.matsize; j++){
-    for(int i=0; i<Mesh.matsize; i++){
+  for(int i=0; i<Mesh.matsize; i++){
+    for(int j=0; j<Mesh.matsize; j++){
       Aout<<std::setw(5)<<A[i][j]<<",";
     }
     Aout<<std::endl;
