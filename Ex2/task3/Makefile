@@ -4,7 +4,7 @@ all:
 	g++ -o ./main.exe ./main.cpp
 		
 	#no spaces after backslash in for loop
-	for i in 10 100 1000 10000 100000 200000 500000; do \
+	for i in 10 100 1000 10000 50000; do \
 		normcsv=./normiter_$${i}.csv;\
 		terminalout=./output.log;\
 		./main.exe iternum_$${i} 128 $$i 0.0 0.0 0.5 0.5 0.1 > $${terminalout};\
