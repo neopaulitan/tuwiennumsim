@@ -75,7 +75,7 @@ auto parse(int argc, char *argv[]) {
 struct mesh{
     int N; // width && height
     int NN; // mesh size
-    int matsize; // size of non-boundary part (i.e.# unknowns)=(N-2)*(N-2)
+    int matsize; // size of non-boundary part
     double h; // 1.0/N
 };
 
@@ -85,31 +85,39 @@ void Amatgen(mesh Mesh, double **A){
 	double cy=-1.0/std::pow(Mesh.h, 2);
 	double c1=2*cx+2*cy;
 	for(int j=0; j<Mesh.N; j++){
-		for(int i=0; i<Mesh.N-2; i++){
-			int idx=i+j*(Mesh.N-2);
+		for(int i=0; i<Mesh.N; i++){
+			int idx=i+j*Mesh.N;
 			A[idx][idx]=c1;
-			if(j>0){
-				A[idx][idx-(Mesh.N-2)]=cy;
+			if(j>0&&i!=0&&i!=Mesh.N-1){
+				A[idx][idx-Mesh.N]=cy;
 			}
-			if(j<Mesh.N-1){
-				A[idx][idx+(Mesh.N-2)]=cy;
+			if(j<Mesh.N-1&&i!=0&&i!=Mesh.N-1){
+				A[idx][idx+Mesh.N]=cy;
 			}
-			if(i>0){
+			if(i>0&&i!=Mesh.N-1){
 				A[idx][idx-1]=cx;
 			}
-			if(i<Mesh.N-3){
+			if(i<Mesh.N-1&&i!=0){
 				A[idx][idx+1]=cx;
 			}
       // applying boundary conditions
+      // left Dirichlet
+      if(i==0){
+        A[idx][idx]=1;
+      }
+      // right Dirichlet
+      else if(i==Mesh.N-1){
+        A[idx][idx]=1;
+      }
       // top Neumann cells
-      if(j==0){
+      else if(j==0){
         // j=0: u_S(ghost)=u_N, u_S+u_N=2*u_N
-        A[idx][idx+(Mesh.N-2)]+=cy;
+        A[idx][idx+Mesh.N]+=cy;
       }
       // bottom Neumann cells
-      if(j==Mesh.N-1){
+      else if(j==Mesh.N-1){
         // j=N-1: u_N(ghost)=u_S, u_S+u_N=2*u_S
-				A[idx][idx-(Mesh.N-2)]+=cy;
+				A[idx][idx-Mesh.N]+=cy;
 			}
 		}
 	}
@@ -121,32 +129,32 @@ void  sourcevec(mesh Mesh, double *b, double dev, double xsrc, double ysrc, doub
 	// basic source term (i,j only for blue points)
 	for (int j=0; j<Mesh.N; j++){
 		double ypos=j*Mesh.h;
-    for (int i=0; i<Mesh.N-2; i++){
-      int idx=i+j*(Mesh.N-2);
-      double xpos=Mesh.h+i*Mesh.h;
+    for (int i=0; i<Mesh.N; i++){
+      int idx=i+j*(Mesh.N);
+      double xpos=i*Mesh.h;
 			b[idx]=1.0/(2*M_PI*std::pow(dev, 2)) * exp(-(std::pow(xpos-xsrc, 2)+std::pow(ypos-ysrc, 2))/(2*std::pow(dev, 2)));
 		}
 	}
   // applying boundary conditions
   // bottom Neumann cells: j=0
-  for(int i=0; i<Mesh.N-2; i++){
-    int idx=i+0*(Mesh.N-2);
+  for(int i=1; i<Mesh.N-1; i++){
+    int idx=i+0*Mesh.N;
     b[idx]+=-2*1.0/Mesh.h*BC_neumann; // b-2/h*g * u_S = b+0
   }
   // top Neumann cells: j=N-1
-  for(int i=0; i<Mesh.N-2; i++){
-    int idx=i+(Mesh.N-1)*(Mesh.N-2);
+  for(int i=1; i<Mesh.N-1; i++){
+    int idx=i+(Mesh.N-1)*Mesh.N;
     b[idx]+=-2*1.0/Mesh.h*BC_neumann; // b-2/h*g * u_N = b+0
   }
   // left Dirichlet cells: i=0
   for(int j=0; j<Mesh.N; j++){
-    int idx=0+j*(Mesh.N-2);
-    b[idx]+=1.0/std::pow(Mesh.h, 2)*BC_dirichlet_W; // b+1/h^2 * u_W
+    int idx=0+j*Mesh.N;
+    b[idx]=BC_dirichlet_W; // b=u_W, with A.coef=1
   }
   // right Dirichlet cells: i=N-3
   for(int j=0; j<Mesh.N; j++){
-    int idx=(Mesh.N-3)+j*(Mesh.N-2);
-    b[idx]+=1.0/std::pow(Mesh.h, 2)*BC_dirichlet_E; // b+1/h^2 * u_E
+    int idx=(Mesh.N-1)+j*Mesh.N;
+    b[idx]=BC_dirichlet_E; // b=u_E, with A.coef=1
   }
 	return;
 }
@@ -259,7 +267,7 @@ int main(int argc, char *argv[]) try{
   Mesh.N=opts.N;
   Mesh.h=1.0/(opts.N-1);
   Mesh.NN=opts.N*opts.N;
-  Mesh.matsize=opts.N*(opts.N-2);
+  Mesh.matsize=opts.N*opts.N;
 
   // 3.1.1: initialize A, b
   double** A=new double*[Mesh.matsize];
