@@ -2,4 +2,9 @@
 *.o
 *.a
 .idea
+<<<<<<< HEAD
+=======
+*.csv
+*.exe
+>>>>>>> 4edbf2f0d2c0733a4916fd7d12291c119e79b15c
 ./.vscode
