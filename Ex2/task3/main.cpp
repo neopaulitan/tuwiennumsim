@@ -10,13 +10,10 @@
 #include <string>
 #include <tuple>
 #include <vector>
-<<<<<<< HEAD
-=======
 #include <iomanip>
 #include <chrono>
 using namespace std;
 using namespace std::chrono;
->>>>>>> 4edbf2f0d2c0733a4916fd7d12291c119e79b15c
 
 namespace program_options {
 
@@ -75,15 +72,6 @@ auto parse(int argc, char *argv[]) {
 
 } // namespace program_options
 
-<<<<<<< HEAD
-int main(int argc, char *argv[]) try {
-
-  auto opts = program_options::parse(argc, argv);
-
-  opts.print();
-
-  // write csv
-=======
 struct mesh{
     int N; // width && height
     int NN; // mesh size
@@ -261,7 +249,6 @@ int main(int argc, char *argv[]) try{
   auto opts = program_options::parse(argc, argv);
   opts.print();
   // write mesh values into csv
->>>>>>> 4edbf2f0d2c0733a4916fd7d12291c119e79b15c
   auto write = [ N = opts.N, name = opts.name ](const auto &x) -> auto {
     std::ofstream csv;
     csv.open(name + ".csv");
@@ -275,10 +262,6 @@ int main(int argc, char *argv[]) try{
     csv.close();
   };
 
-<<<<<<< HEAD
-  std::vector<double> demo(opts.N * opts.N,2.0);
-  write(demo);
-=======
   // initialize mesh
   mesh Mesh;
   Mesh.N=opts.N;
@@ -347,14 +330,9 @@ int main(int argc, char *argv[]) try{
   std::cout << "jacobi process' time taken: " << duration.count() << "E-6 s" <<endl; // e-6 really?
   // 3.2.4: write out the results
   write(u);
->>>>>>> 4edbf2f0d2c0733a4916fd7d12291c119e79b15c
 
   return EXIT_SUCCESS;
 } catch (std::exception &e) {
   std::cout << e.what() << std::endl;
   return EXIT_FAILURE;
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> 4edbf2f0d2c0733a4916fd7d12291c119e79b15c
