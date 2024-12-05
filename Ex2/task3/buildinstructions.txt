@@ -1,0 +1,13 @@
+Build Instructions:
+
+make
+	compiles solver executable, main.exe
+	follows format provided by boilerplate code
+	
+make iteration
+	runs solver for iterations = (10, 100, 1000, 10000, 50000) using 
+	parameters provided in report
+	
+make clean
+	removes main executable and output file, and generated csv files
+

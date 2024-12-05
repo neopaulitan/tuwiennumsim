@@ -2,7 +2,8 @@
 all:
 	g++ -c ./main.cpp -o ./main.o -std=c++14
 	g++ -o ./main.exe ./main.cpp
-		
+
+iteration:		
 	#no spaces after backslash in for loop
 	for i in 10 100 1000 10000 50000; do \
 		normcsv=./normiter_$${i}.csv;\

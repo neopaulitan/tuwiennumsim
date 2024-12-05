@@ -1,0 +1,5 @@
+make
+	compiles main.cpp as mmm and runs executable
+
+make clean
+	removes compiled files
