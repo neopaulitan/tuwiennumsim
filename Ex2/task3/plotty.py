@@ -3,7 +3,7 @@ import os
 import matplotlib.pyplot as plt
 import csv
 
-iter = [10, 100, 1000, 10000, 50000]
+iter = [10, 100, 500, 1000, 5000]
 itersize = len(iter)
 residtabs = np.zeros((itersize, 3))
 
@@ -16,55 +16,50 @@ for i in range(0,itersize):
 		residtabs[i][1] = data[1][0]
 		residtabs[i][2] = data[2][0]
 
-#fig1, (ax1,ax2) = plt.subplots(2, figsize = (6,12))
-fig1, (ax1,ax2) = plt.subplots(2, 1)
-ax1.scatter(residtabs[:,0], residtabs[:,1])
-ax2.scatter(residtabs[:,0], residtabs[:,1])
-ax2.set_xlabel("Number of Iterations (log)")
-ax1.set_xscale("log")
-ax2.set_xscale("log")
-ax2.set_ylabel("2-Norm Residuals")
-ax1.set_title("Plot of 2-Norm by Iterations")
-ax1.set_ylim(0.0058, 0.0065)
-ax2.set_ylim(-0.5E-13, 1E-13)
+numiter = residtabs[:,0]
+lognumiter = np.log10(numiter)
+twonorm = residtabs[:,1]
+infnorm = residtabs[:,2]
 
-# hide the spines between ax and ax2
-ax1.spines.bottom.set_visible(False)
-ax2.spines.top.set_visible(False)
-ax1.xaxis.tick_top()
-ax1.tick_params(labeltop=False)  # don't put tick labels at the top
-ax2.xaxis.tick_bottom()
-d = .5  # proportion of vertical to horizontal extent of the slanted line
-kwargs = dict(marker=[(-1, -d), (1, d)], markersize=12,
-              linestyle="none", color='k', mec='k', mew=1, clip_on=False)
-ax1.plot([0, 1], [0, 0], transform=ax1.transAxes, **kwargs)
-ax2.plot([0, 1], [1, 1], transform=ax2.transAxes, **kwargs)
+coeff1 = np.polyfit(lognumiter, twonorm, 1) 
+slope1 = coeff1[0] 
+intercept1 = coeff1[1]  
+
+coeff2 = np.polyfit(lognumiter, infnorm, 1) 
+slope2 = coeff2[0] 
+intercept2 = coeff2[1]  
+
+poly1x = np.linspace(min(lognumiter), max(lognumiter), 10)
+poly1y = slope1 * poly1x + intercept1
+
+poly2x = np.linspace(min(lognumiter), max(lognumiter), 10)
+poly2y = slope2 * poly2x + intercept2
+
+
+#fig1, (ax1,ax2) = plt.subplots(2, figsize = (6,12))
+fig1, (ax1) = plt.subplots(1, 1)
+ax1.scatter(lognumiter, twonorm)
+ax1.plot(poly1x, poly1y, color = 'red', label=f'slope = {slope1:.2f}') 
+ax1.set_xlabel("Number of Iterations (log)")
+#ax1.set_xscale("log")
+ax1.set_ylabel("2-Norm Residuals")
+ax1.set_title("Plot of 2-Norm by Iterations")
+fig1.legend()
+#ax1.set_ylim(0.0058, 0.0065)
+#ax2.set_ylim(-0.5E-13, 1E-13)
 
 fig1.savefig("2normplot.png")
 
-fig2, (ax1, ax2) = plt.subplots(2, 1)
-ax1.scatter(residtabs[:,0], residtabs[:,2])
-ax2.scatter(residtabs[:,0], residtabs[:,2])
-ax2.set_xlabel("Number of Iterations")
+fig2, (ax1) = plt.subplots(1, 1)
+ax1.scatter(lognumiter, infnorm)
+ax1.plot(poly2x, poly2y, color = 'red', label=f'slope = {slope1:.2f}') 
+ax1.set_xlabel("Number of Iterations (log)")
+#ax1.set_xscale("log")
 ax1.set_ylabel("Inf-Norm Residuals")
 ax1.set_title("Plot of Inf-Norm by Iterations")
-ax1.set_xscale("log")
-ax2.set_xscale("log")
-ax2.set_ylabel("Inf-Norm Residuals")
-ax1.set_ylim(0.0002, 0.0003)
-ax2.set_ylim(-2E-15, 8E-15)
-# hide the spines between ax and ax2
-ax1.spines.bottom.set_visible(False)
-ax2.spines.top.set_visible(False)
-ax1.xaxis.tick_top()
-ax1.tick_params(labeltop=False)  # don't put tick labels at the top
-ax2.xaxis.tick_bottom()
-d = .5  # proportion of vertical to horizontal extent of the slanted line
-kwargs = dict(marker=[(-1, -d), (1, d)], markersize=12,
-              linestyle="none", color='k', mec='k', mew=1, clip_on=False)
-ax1.plot([0, 1], [0, 0], transform=ax1.transAxes, **kwargs)
-ax2.plot([0, 1], [1, 1], transform=ax2.transAxes, **kwargs)
-
+fig2.legend()
+#ax1.set_ylim(0.0058, 0.0065)
+#ax2.set_ylim(-0.5E-13, 1E-13)
 
 fig2.savefig("infnormplot.png")
 
@@ -78,6 +73,6 @@ def plot_and_save(filename):
     plt.show()
 
 plot_and_save("iternum_100.csv")
-plot_and_save("iternum_50000.csv")
+plot_and_save("iternum_5000.csv")
 
 plt.show()

@@ -83,7 +83,7 @@ struct mesh{
 void Amatgen(mesh Mesh, double **A){
 	double cx=-1.0/std::pow(Mesh.h, 2);
 	double cy=-1.0/std::pow(Mesh.h, 2);
-	double c1=2*cx+2*cy;
+	double c1=-1.0*(2.0*cx+2.0*cy);
 	for(int j=0; j<Mesh.N; j++){
 		for(int i=0; i<Mesh.N; i++){
 			int idx=i+j*Mesh.N;
