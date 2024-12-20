@@ -11,5 +11,7 @@ all:
 		./main.exe bcsstk13.mtx $$i; \
 	done
 
+	python ./plot.py
+
 	# clean unnecessary binaries/executables
 	rm ./main.exe ./main.o
