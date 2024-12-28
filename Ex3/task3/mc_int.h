@@ -18,10 +18,10 @@ float x4m5(float x) {
     return 5*pow(x, 4);
 }
 
-// Funktion, um eine Zufallszahl im Intervall [xmin, xmax] zu erzeugen
+// Fgenerates a random number in the interval [min, max].
 double generateRandomNumber(double min, double max) {
-    std::random_device rd;  // Zufallsgerät
+    std::random_device rd;  // Hardware-Generator
     std::mt19937 gen(rd()); // Mersenne-Twister-Generator
-    std::uniform_real_distribution<> dis(min, max); // Gleichverteilte Zufallszahlen im Intervall [min, max]
+    std::uniform_real_distribution<> dis(min, max); // Uniform distribution in [min, max]
     return dis(gen);
 }
