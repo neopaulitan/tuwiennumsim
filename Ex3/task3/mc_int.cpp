@@ -23,11 +23,14 @@ int main(int argc, char *argv[]) {
     // Function pointer to the function to be integrated.
     float (*f_val)(float) = NULL;
 
-    if (strcmp(function, "sinx") == 0) {
+    std::string func_str(function);
+    std::transform(func_str.begin(), func_str.end(), func_str.begin(), ::tolower);
+
+    if (func_str == "sinx") {
         f_val = sinx;
-    } else if (strcmp(function, "cos2xinv") == 0) {
+    } else if (func_str == "cos2xinv") {
         f_val = cos2xinv;
-    } else if (strcmp(function, "x4m5") == 0) {
+    } else if (func_str == "x4m5") {
         f_val = x4m5;
     } else {
         std::cout << "Invalid function name!" << std::endl;
@@ -36,20 +39,17 @@ int main(int argc, char *argv[]) {
 
     srand(time(NULL));
 
-    double inside = 0.0;
+    double integral = 0.0;
 
-    // Checks for each random pair of x and y if they are inside circle of radius 1.
-    for (int i = 1; i < samples; i++) {
+    // Calculating integral sum.
+    for (int k = 1; k <= samples; k++) {
         double randX = generateRandomNumber(xmin, xmax);
-        double randY = generateRandomNumber(xmin, xmax);
-        if (randY <= f_val(randX)) {
-            inside++;
-        }
+        integral += f_val(randX);
     }
 
-    // Calculating pi and printing.
-    inside *= (xmax - xmin) / samples;
+    // Calculating mean.
+    integral *= (xmax - xmin) / samples;
 
-    std::cout << "Integral: " << inside << std::endl;
+    std::cout << "Integral: " << integral << std::endl;
     return 0;
 }

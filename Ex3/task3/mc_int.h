@@ -15,7 +15,7 @@ float cos2xinv(float x) {
 }
 
 float x4m5(float x) {
-    return pow(5*x, 4);
+    return 5*pow(x, 4);
 }
 
 // Funktion, um eine Zufallszahl im Intervall [xmin, xmax] zu erzeugen
