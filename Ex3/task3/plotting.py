@@ -1,37 +1,37 @@
-import subprocess
+import pandas as pd
 import matplotlib.pyplot as plt
-import os
 
-def run_mc_int(func, num_threads):
-    # Set the environment variable
-    env = os.environ.copy()
-    env['OMP_NUM_THREADS'] = str(num_threads)
+# Read the CSV file
+csv_file = "runtimes.csv"
+data = pd.read_csv(csv_file)
 
-    # Run the command with the environment variable
-    result = subprocess.run(['./mc_int', func, '-1.57079632679', '1.57079632679', '1000000'], 
-                            capture_output=True, text=True, env=env)
-    
-    # Extract the line containing "Elapsed time:"
-    output = result.stdout.strip()
-    runtime = next(line for line in output.split('\n') if "Elapsed time:" in line)
+# Extract the unique functions
+functions = data["Function"].unique()
 
-    print(runtime)
+# Plot the runtime for each function
+plt.figure(figsize=(10, 6))
 
-    runtime = float(runtime.split(':')[1].strip().removesuffix('s'))
-    
-    return runtime
+for func in functions:
+    func_data = data[data["Function"] == func]
+    plt.plot(
+        func_data["Threads"], 
+        func_data["Runtime(s)"], 
+        marker="o", 
+        label=func
+    )
 
-if __name__ == "__main__":
-    functions = ['sinx', 'cos2xinv', 'x4m5']
-    num_threads = [1, 5, 10, 20, 40, 80]
+# Customize the plot
+plt.title("Runtime vs Threads for Different Functions")
+plt.xlabel("Number of Threads")
+plt.ylabel("Runtime (s)")
+plt.grid(True, which="both", linestyle="--", linewidth=0.5)
+plt.legend(title="Functions")
+plt.tight_layout()
 
-    runtimes = {func: [run_mc_int(func, num_thread) for num_thread in num_threads] for func in functions}
+# Save the plot
+output_plot = "runtimes_plot.png"
+plt.savefig(output_plot)
+print(f"Plot saved as {output_plot}")
 
-    plt.switch_backend('TkAgg')
-    for func in functions:
-        plt.scatter(num_threads, runtimes[func], label=func)
-
-    plt.xlabel('Number of threads')
-    plt.ylabel('Runtime (s)')
-    plt.legend()
-    plt.show()
+# Show the plot
+plt.show()
