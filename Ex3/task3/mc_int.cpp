@@ -5,23 +5,17 @@ using namespace std;
 int main(int argc, char *argv[]) {
 
     if (argc != 5) {
-        printf("Invalid number of arguments!\n");
+        std::cout << "Invalid number of arguments!" << std::endl;
         return 1;
     }
 
     char* function = argv[1];
-    double xmin = atof(argv[2]);
-    double xmax = atof(argv[3]);
-    int samples = atoi(argv[4]);
-
-    std::cout << "You provided the following arguments:\n" << std::endl;
-    std::cout << "Function: " << function << std::endl;
-    std::cout << "Xmin: " << xmin << std::endl;
-    std::cout << "Xmax: " << xmax << std::endl;
-    std::cout << "Samples: " << samples << std::endl;
+    double xmin = strtod(argv[2], nullptr);
+    double xmax = strtod(argv[3], nullptr);
+    long samples = static_cast<long>(strtod(argv[4], nullptr));
 
     // Function pointer to the function to be integrated.
-    float (*f_val)(float) = NULL;
+    float (*f_val)(float) = nullptr;
 
     std::string func_str(function);
     std::transform(func_str.begin(), func_str.end(), func_str.begin(), ::tolower);
@@ -37,19 +31,58 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 
-    srand(time(NULL));
+    std::mt19937 shared_rng(42); // fixed seed for reproducibility
+    std::mutex rng_mutex;
 
-    double integral = 0.0;
+    double global_integral = 0.0;
 
-    // Calculating integral sum.
-    for (int k = 1; k <= samples; k++) {
-        double randX = generateRandomNumber(xmin, xmax);
-        integral += f_val(randX);
+    auto start_time = std::chrono::high_resolution_clock::now();
+
+    #pragma omp parallel
+    {
+        unsigned int thread_seed;
+        {
+            std::lock_guard<std::mutex> lock(rng_mutex);
+            thread_seed = shared_rng();
+        }
+
+        std::mt19937 thread_rng(thread_seed);
+        double thread_integral = 0.0;
+
+        // Calculating integral sum.
+        #pragma omp for reduction(+:global_integral)
+        for (int k = 0; k < samples; k++) {
+            double randX = generateRandomNumber(xmin, xmax, thread_rng);
+            thread_integral += f_val(randX);
+        }
+
+        // Calculating mean.
+        thread_integral *= (xmax - xmin) / samples;
+
+        #pragma omp critical
+        {
+            std::cout << "Integral: " << thread_integral << std::endl;
+        }
+
+        #pragma omp atomic
+        global_integral += thread_integral;
     }
 
-    // Calculating mean.
-    integral *= (xmax - xmin) / samples;
+    auto end_time = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double> elapsed = end_time - start_time;
 
-    std::cout << "Integral: " << integral << std::endl;
+    int num_threads;
+    #pragma omp parallel
+    {
+        #pragma omp single
+        {
+            num_threads = omp_get_num_threads();
+        }
+    }
+
+    std::cout << "Final Integral: " << global_integral/num_threads << std::endl;
+    std::cout << "Threads used:" << num_threads << std::endl;
+    std::cout << "Total Samples: " << samples << std::endl;
+    std::cout << "Elapsed time: " << elapsed.count() << "s" << std::endl;
     return 0;
 }
