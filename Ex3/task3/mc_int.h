@@ -19,7 +19,7 @@ float x4m5(float x) {
     return 5*pow(x, 4);
 }
 
-// Fgenerates a random number in the interval [min, max].
+// generates a random number in the interval [min, max].
 double generateRandomNumber(double min, double max, std::mt19937 &gen) {
     std::uniform_real_distribution<> dis(min, max); // Uniform distribution in [min, max]
     return dis(gen);
