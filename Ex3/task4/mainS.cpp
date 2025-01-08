@@ -51,7 +51,8 @@ int main(int argc, char *argv[]) try {
   // initial guess (0.0) with fixed values in west (-100) and east (100)
   auto init = [N = opts.N, W = -100.0, E = 100.0]() -> auto {
     std::vector<double> res(N * N);
-    for (size_t j = 0; j < N; ++j)
+    #pragma omp parallel for collapse(2) schedule(static)
+    for (size_t j = 0; j < N; ++j) 
       for (size_t i = 0; i < N; ++i) {
         res[i + j * N] = 0.0;
         if (i % N == 0)
@@ -68,9 +69,7 @@ int main(int argc, char *argv[]) try {
     auto h = 1.0 / (N - 1);
     auto h2 = h * h;
     // all interior points
-    #pragma omp parallel
-    {
-    #pragma omp for collapse(2)
+    #pragma omp parallel for collapse(2) schedule(static)
     for (size_t j = 1; j < N - 1; ++j) {
       for (size_t i = 1; i < N - 1; ++i) {
         auto w = xold[(i - 1) + (j)*N];
@@ -87,10 +86,7 @@ int main(int argc, char *argv[]) try {
     
     
     // isolating south boundary
-    #pragma omp single
-    {
-    #pragma omp task
-    {
+    #pragma omp parallel for schedule(static)
       for (size_t i = 1; i < N - 1; ++i) {
       	size_t j = 0;
         auto w = xold[(i - 1) + (j)*N];
@@ -103,10 +99,9 @@ int main(int argc, char *argv[]) try {
         else
           xnew[i + j * N] = (-1.0 / h2) * (w + e + n + s - 4 * c);
       }
-    }
+      
     // isolating north boundary
-    #pragma omp task
-    {
+	#pragma omp parallel for schedule(static)
       for (size_t i = 1; i < N - 1; ++i) {
       	size_t j = N - 1;
         auto w = xold[(i - 1) + (j)*N];
@@ -119,9 +114,6 @@ int main(int argc, char *argv[]) try {
         else
           xnew[i + j * N] = (-1.0 / h2) * (w + e + n + s - 4 * c);
       }
-	} //task
-      } //single
-      } //parallel
   };
 
   // write vector to csv
@@ -141,7 +133,7 @@ int main(int argc, char *argv[]) try {
   // 2 norm
   auto norm2 = [N = opts.N](const auto &vec) -> auto {
     double sum = 0.0;
-    #pragma omp parallel for collapse(2) reduction(+:sum)
+    #pragma omp parallel for collapse(2) reduction(+:sum) schedule(static)
     for (size_t j = 0; j < N; ++j)
       for (size_t i = 1; i < (N - 1); ++i)
         sum += vec[i + j * N] * vec[i + j * N];
@@ -152,7 +144,7 @@ int main(int argc, char *argv[]) try {
   // Inf norm
   auto normInf = [N = opts.N](const auto &vec) -> auto {
     double max = 0.0;
-    #pragma omp parallel for collapse(2) reduction(+:max)
+    #pragma omp parallel for collapse(2) reduction(+:max) schedule(static)
     for (size_t j = 0; j < N; ++j)
       for (size_t i = 1; i < (N - 1); ++i)
         max = std::fabs(vec[i + j * N]) > max ? std::fabs(vec[i + j * N]) : max;
