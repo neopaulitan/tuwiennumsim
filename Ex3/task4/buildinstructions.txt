@@ -1,0 +1,8 @@
+Build Instructions:
+
+make
+	compiles solver executable for three different scheduling policies (mainS = static; mainS1 = static,1; mainD = dynamic) 
+	
+make clean
+	removes main executable and output file, and generated csv files
+

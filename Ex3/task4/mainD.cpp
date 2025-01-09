@@ -69,7 +69,9 @@ int main(int argc, char *argv[]) try {
     auto h = 1.0 / (N - 1);
     auto h2 = h * h;
     // all interior points
-    #pragma omp parallel for collapse(2) schedule(dynamic)
+    #pragma omp parallel
+    {
+    #pragma omp for collapse(2) schedule(dynamic)
     for (size_t j = 1; j < N - 1; ++j) {
       for (size_t i = 1; i < N - 1; ++i) {
         auto w = xold[(i - 1) + (j)*N];
@@ -86,7 +88,7 @@ int main(int argc, char *argv[]) try {
     
     
     // isolating south boundary
-    #pragma omp parallel for schedule(dynamic)
+    #pragma omp for schedule(dynamic)
       for (size_t i = 1; i < N - 1; ++i) {
       	size_t j = 0;
         auto w = xold[(i - 1) + (j)*N];
@@ -101,7 +103,7 @@ int main(int argc, char *argv[]) try {
       }
       
     // isolating north boundary
-	#pragma omp parallel for schedule(dynamic)
+	#pragma omp for schedule(dynamic)
       for (size_t i = 1; i < N - 1; ++i) {
       	size_t j = N - 1;
         auto w = xold[(i - 1) + (j)*N];
@@ -113,6 +115,7 @@ int main(int argc, char *argv[]) try {
           xnew[i + j * N] = (- (-1.0 / h2) * (w + e + n + s)) * h2 / 4.0;
         else
           xnew[i + j * N] = (-1.0 / h2) * (w + e + n + s - 4 * c);
+      }
       }
   };
 

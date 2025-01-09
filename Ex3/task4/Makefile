@@ -10,5 +10,6 @@ all:
 	g++ -o ./mainD ./mainD.cpp
 
 clean:
-	rm ./main.exe ./main.o
+	rm *.exe 
+	rm *.o
 	rm *.csv
